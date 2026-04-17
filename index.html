@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BIS Swim Gala 2025-26 — Home</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .hero {
+      background: linear-gradient(160deg, var(--surface) 0%, #0d1b35 100%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 32px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '🏊';
+      position: absolute;
+      right: 32px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 100px;
+      opacity: 0.08;
+    }
+    .hero-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+    .hero-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 52px;
+      font-weight: 900;
+      color: var(--white);
+      line-height: 1;
+      letter-spacing: -1px;
+      margin-bottom: 10px;
+    }
+    .hero-sub {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    /* House Points Board */
+    .scoreboard {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .score-card {
+      border-radius: 14px;
+      padding: 28px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+      transition: transform 0.2s;
+    }
+    .score-card:hover { transform: translateY(-3px); }
+    .score-card.leader::after {
+      content: '👑 LEADING';
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      background: var(--gold);
+      color: #000;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+    .score-card-alpha { background: linear-gradient(160deg, rgba(229,57,53,0.25), rgba(229,57,53,0.05)); border: 1px solid rgba(229,57,53,0.4); }
+    .score-card-beta  { background: linear-gradient(160deg, rgba(46,125,50,0.25), rgba(46,125,50,0.05)); border: 1px solid rgba(46,125,50,0.4); }
+    .score-card-gamma { background: linear-gradient(160deg, rgba(21,101,192,0.25), rgba(21,101,192,0.05)); border: 1px solid rgba(21,101,192,0.4); }
+
+    .score-house {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .score-alpha { color: #FF6B6B; }
+    .score-beta  { color: #66BB6A; }
+    .score-gamma { color: #64B5F6; }
+
+    .score-pts {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 72px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -2px;
+    }
+    .score-alpha-pts { color: #FF6B6B; text-shadow: 0 0 40px rgba(229,57,53,0.3); }
+    .score-beta-pts  { color: #66BB6A; text-shadow: 0 0 40px rgba(46,125,50,0.3); }
+    .score-gamma-pts { color: #64B5F6; text-shadow: 0 0 40px rgba(21,101,192,0.3); }
+
+    .score-label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    .last-race-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 14px;
+      padding: 20px 0;
+    }
+
+    .last-event-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 16px;
+    }
+
+    .podium-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .podium-row:last-child { border-bottom: none; }
+    .podium-time {
+      margin-left: auto;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .stat-item { text-align: center; padding: 16px; background: var(--surface2); border-radius: 10px; }
+    .stat-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--gold);
+    }
+    .stat-lbl { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-top: 2px; }
+
+    .refresh-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .live-dot {
+      width: 8px; height: 8px;
+      background: #66BB6A;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    @media (max-width: 768px) {
+      .scoreboard { grid-template-columns: 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      .score-pts { font-size: 52px; }
+      .hero-title { font-size: 36px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="nav-placeholder"></div>
+
+  <div class="page-wrap">
+    <div class="hero">
+      <div class="hero-label">BIS Interhouse Championship</div>
+      <div class="hero-title">SWIM GALA<br>2025–26</div>
+      <div class="hero-sub">18 April 2026 &nbsp;·&nbsp; NSCI Aquatic Centre &nbsp;·&nbsp; 1:00 PM – 4:00 PM</div>
+    </div>
+
+    <div class="refresh-bar">
+      <div class="live-dot"></div>
+      <span id="refresh-status">Connecting to live data...</span>
+    </div>
+
+    <div class="section-head">🏆 House Points Leaderboard</div>
+    <div class="scoreboard" id="scoreboard">
+      <div class="score-card score-card-alpha">
+        <div class="score-house score-alpha">Alpha</div>
+        <div class="score-pts score-alpha-pts" id="pts-alpha">—</div>
+        <div class="score-label">Points</div>
+      </div>
+      <div class="score-card score-card-beta">
+        <div class="score-house score-beta">Beta</div>
+        <div class="score-pts score-beta-pts" id="pts-beta">—</div>
+        <div class="score-label">Points</div>
+      </div>
+      <div class="score-card score-card-gamma">
+        <div class="score-house score-gamma">Gamma</div>
+        <div class="score-pts score-gamma-pts" id="pts-gamma">—</div>
+        <div class="score-label">Points</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="section-head">⚡ Last Completed Race</div>
+        <div id="last-race"><div class="last-race-empty">No results yet</div></div>
+      </div>
+      <div class="card">
+        <div class="section-head">📊 Meet Stats</div>
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-item"><div class="stat-num" id="stat-events">—</div><div class="stat-lbl">Total Events</div></div>
+          <div class="stat-item"><div class="stat-num" id="stat-athletes">—</div><div class="stat-lbl">Athletes</div></div>
+          <div class="stat-item"><div class="stat-num" id="stat-completed">—</div><div class="stat-lbl">Done</div></div>
+          <div class="stat-item"><div class="stat-num" id="stat-remaining">—</div><div class="stat-lbl">Remaining</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="utils.js"></script>
+  <script>
+    document.getElementById('nav-placeholder').innerHTML = NAV_HTML;
+    setActiveNav();
+
+    async function render() {
+      const results = await fetchResults();
+      const totals  = calcHouseTotals(results);
+
+      // House scores
+      document.getElementById('pts-alpha').textContent = totals.Alpha;
+      document.getElementById('pts-beta').textContent  = totals.Beta;
+      document.getElementById('pts-gamma').textContent = totals.Gamma;
+
+      // Leader crown — shown on ALL houses that share the top score (handles ties)
+      const max = Math.max(totals.Alpha, totals.Beta, totals.Gamma);
+      document.querySelectorAll('.score-card').forEach(c => c.classList.remove('leader'));
+      if (max > 0) {
+        if (totals.Alpha === max) document.querySelector('.score-card-alpha').classList.add('leader');
+        if (totals.Beta  === max) document.querySelector('.score-card-beta').classList.add('leader');
+        if (totals.Gamma === max) document.querySelector('.score-card-gamma').classList.add('leader');
+      }
+
+      // Meet stats — all dynamic from sheet, no hardcoded 27
+      const uniqueAthletes  = new Set(results.map(r => r.ParticipantName)).size;
+      const allEventNums    = [...new Set(results.map(r => (r['Event#'] || '').trim()).filter(Boolean))];
+      const totalEvents     = allEventNums.length;
+      const completedEvents = new Set(results.filter(r => r._eventCompleted).map(r => (r['Event#'] || '').trim())).size;
+      document.getElementById('stat-events').textContent    = totalEvents;
+      document.getElementById('stat-athletes').textContent  = uniqueAthletes;
+      document.getElementById('stat-completed').textContent = completedEvents;
+      document.getElementById('stat-remaining').textContent = totalEvents - completedEvents;
+
+      // Last completed race
+      const last = getLastCompletedEvent(results);
+      const lr   = document.getElementById('last-race');
+      if (!last) {
+        lr.innerHTML = '<div class="last-race-empty">No results yet — race day hasn\'t started!</div>';
+      } else {
+        // Get event name from the rows themselves (no SWIM_DATA needed)
+        const eventName = last.rows[0]['EventName'] || `Event #${last.event_number}`;
+        const top3 = last.rows
+          .filter(r => r._timeSec !== null && r._position && r._position <= 3)
+          .sort((a, b) => a._position - b._position);
+
+        lr.innerHTML = `<div class="last-event-title">Event #${last.event_number}: ${eventName}</div>` +
+          (top3.length === 0
+            ? '<div class="last-race-empty">Results being processed…</div>'
+            : top3.map(r => `
+              <div class="podium-row">
+                ${posBadge(r._position)}
+                ${nameSpan(r.ParticipantName, r.House)}
+                ${houseBadge(r.House)}
+                <span class="podium-time">${formatTime(r._timeSec)}</span>
+              </div>`).join(''));
+      }
+
+      document.getElementById('refresh-status').textContent = `Live · Last updated ${new Date().toLocaleTimeString()}`;
+    }
+
+    startAutoRefresh(render, 20000);
+  </script>
+</body>
+</html>

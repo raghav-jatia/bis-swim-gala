@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BIS Swim Gala — Participants</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      align-items: center;
+    }
+    .search-wrap { position: relative; }
+    .search-input {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 14px 9px 36px;
+      color: var(--text);
+      font-family: 'Barlow', sans-serif;
+      font-size: 14px;
+      width: 240px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--gold); }
+    .search-icon {
+      position: absolute; left: 10px;
+      top: 50%; transform: translateY(-50%);
+      font-size: 14px; pointer-events: none;
+    }
+
+    .filter-btn {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .filter-btn.active-alpha { background: rgba(229,57,53,0.2);  color: #FF6B6B;  border-color: rgba(229,57,53,0.4); }
+    .filter-btn.active-beta  { background: rgba(46,125,50,0.2);  color: #66BB6A;  border-color: rgba(46,125,50,0.4); }
+    .filter-btn.active-gamma { background: rgba(21,101,192,0.2); color: #64B5F6;  border-color: rgba(21,101,192,0.4); }
+    .filter-btn.active-all   { background: var(--gold); color: #000; border-color: var(--gold); }
+
+    .count-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      padding: 4px 0;
+      margin-left: auto;
+    }
+
+    .participant-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 14px;
+    }
+
+    .p-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .p-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+
+    .p-card-alpha { border-left: 3px solid rgba(229,57,53,0.6); }
+    .p-card-beta  { border-left: 3px solid rgba(46,125,50,0.6); }
+    .p-card-gamma { border-left: 3px solid rgba(21,101,192,0.6); }
+
+    .p-card-head {
+      padding: 14px 16px 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .p-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px; font-weight: 900;
+      flex-shrink: 0;
+    }
+    .av-Alpha { background: rgba(229,57,53,0.2);  color: #FF6B6B; }
+    .av-Beta  { background: rgba(46,125,50,0.2);  color: #66BB6A; }
+    .av-Gamma { background: rgba(21,101,192,0.2); color: #64B5F6; }
+
+    .p-name {
+      font-size: 16px; font-weight: 600; line-height: 1.2;
+    }
+    .p-house-line {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .ph-Alpha { color: #FF6B6B; }
+    .ph-Beta  { color: #66BB6A; }
+    .ph-Gamma { color: #64B5F6; }
+
+    .p-events { padding: 0 16px 14px; }
+
+    .p-event-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .p-event-row:last-child { border-bottom: none; }
+
+    /* FIX #11: Event name on participant card uses Nunito */
+    .p-event-name {
+      flex: 1;
+      color: var(--text-muted);
+      font-family: 'Nunito', 'Barlow', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .p-event-time {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px; font-weight: 700;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+
+    .no-athletes {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+      font-size: 15px;
+      grid-column: 1/-1;
+    }
+  </style>
+</head>
+<body>
+  <div id="nav-placeholder"></div>
+  <div class="page-wrap">
+    <div class="page-title">👤 Participants</div>
+    <div class="page-subtitle">All registered athletes &amp; their events</div>
+
+    <div class="controls">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" type="text" id="search" placeholder="Search by name…">
+      </div>
+      <button class="filter-btn active-all" data-h="all">All Houses</button>
+      <button class="filter-btn" data-h="Alpha">🔴 Alpha</button>
+      <button class="filter-btn" data-h="Beta">🟢 Beta</button>
+      <button class="filter-btn" data-h="Gamma">🔵 Gamma</button>
+      <span class="count-badge" id="count-badge"></span>
+    </div>
+
+    <div class="participant-grid" id="participant-grid">
+      <div class="no-athletes">Loading participants…</div>
+    </div>
+  </div>
+
+  <script src="utils.js"></script>
+  <script>
+    document.getElementById('nav-placeholder').innerHTML = NAV_HTML;
+    setActiveNav();
+
+    let allResults = [];
+    let activeHouse = 'all';
+    let searchTerm  = '';
+
+    document.getElementById('search').addEventListener('input', e => {
+      searchTerm = e.target.value.toLowerCase();
+      renderGrid();
+    });
+
+    document.querySelectorAll('[data-h]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-h]').forEach(b => b.className = 'filter-btn');
+        activeHouse = btn.dataset.h;
+        const classMap = { all: 'active-all', Alpha: 'active-alpha', Beta: 'active-beta', Gamma: 'active-gamma' };
+        btn.classList.add(classMap[activeHouse] || 'active-all');
+        renderGrid();
+      });
+    });
+
+    // FIX #1 & #2: buildAthleteMap now reads ENTIRELY from the Google Sheet
+    // results (allResults). If a new participant or new event is added to the
+    // sheet, it appears here automatically — no code change needed.
+    function buildAthleteMap() {
+      const map = {};
+
+      for (const r of allResults) {
+        const name  = (r['ParticipantName'] || '').trim();
+        const house = (r['House'] || '').trim();
+        if (!name) continue;
+
+        if (!map[name]) {
+          map[name] = { name, house, events: [] };
+        }
+
+        map[name].events.push({
+          event_number: (r['Event#'] || '').trim(),
+          event_name:   r['EventName'] || r['Event#'] || '—',
+          heat_number:  parseInt(r['Heat#']) || 0,
+          lane:         parseInt(r['Lane']) || 0,
+          result:       r   // the full row, already enriched with _timeSec / _position
+        });
+      }
+
+      // Sort events within each athlete by event number
+      for (const a of Object.values(map)) {
+        a.events.sort((x, y) => x.event_number - y.event_number);
+      }
+
+      return Object.values(map).sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    function renderGrid() {
+      const athletes = buildAthleteMap();
+      const grid = document.getElementById('participant-grid');
+
+      let filtered = athletes;
+      if (activeHouse !== 'all') filtered = filtered.filter(a => a.house === activeHouse);
+      if (searchTerm) filtered = filtered.filter(a => a.name.toLowerCase().includes(searchTerm));
+
+      document.getElementById('count-badge').textContent =
+        `${filtered.length} athlete${filtered.length !== 1 ? 's' : ''}`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div class="no-athletes">No athletes match this filter.</div>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map(a => {
+        const initials = a.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+
+        const eventsHTML = a.events.map(ev => {
+          const r      = ev.result;
+          const timeStr = r._timeSec !== null ? formatTime(r._timeSec) : '';
+          const st      = (r['Status'] || '').trim().toUpperCase();
+          const isDNS   = st === 'DNS';
+          const isDQ    = st === 'DQ';
+
+          // FIX #10: Only show position badge for top 3. Suppress it for 4th+.
+          const showPos = r._position && r._position <= 3 && !isDNS && !isDQ;
+          const posHTML = showPos ? posBadge(r._position) : '';
+
+          return `<div class="p-event-row">
+            <span class="p-event-name">${ev.event_name}</span>
+            ${posHTML}
+            <span class="p-event-time">
+              ${isDNS ? '<span class="status-dns">DNS</span>'
+                : isDQ  ? '<span class="status-dq">DQ</span>'
+                : timeStr ? timeStr
+                : '<span style="color:var(--text-muted);font-size:12px">—</span>'}
+            </span>
+          </div>`;
+        }).join('');
+
+        return `<div class="p-card p-card-${a.house}">
+          <div class="p-card-head">
+            <div class="p-avatar av-${a.house}">${initials}</div>
+            <div>
+              <div class="p-name name-${a.house}">${a.name}</div>
+              <div class="p-house-line ph-${a.house}">${a.house} House · ${a.events.length} event${a.events.length !== 1 ? 's' : ''}</div>
+            </div>
+          </div>
+          <div class="p-events">${eventsHTML}</div>
+        </div>`;
+      }).join('');
+    }
+
+    async function refresh() {
+      allResults = await fetchResults();
+      renderGrid();
+    }
+
+    startAutoRefresh(refresh, 25000);
+  </script>
+</body>
+</html>

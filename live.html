@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BIS Swim Gala — Live Results</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .live-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(102,187,106,0.1);
+      border: 1px solid rgba(102,187,106,0.3);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #66BB6A;
+    }
+    .live-dot {
+      width: 8px; height: 8px;
+      background: #66BB6A;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .search-wrap { position: relative; }
+    .search-input {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 14px 8px 36px;
+      color: var(--text);
+      font-family: 'Barlow', sans-serif;
+      font-size: 14px;
+      width: 220px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--gold); }
+    .search-icon {
+      position: absolute; left: 10px;
+      top: 50%; transform: translateY(-50%);
+      font-size: 14px; pointer-events: none;
+    }
+
+    /* ── Event block ── */
+    .event-block {
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    /* FIX #9: The header is a <button> so clicks are crisp, no bubbling glitches */
+    .event-block-head {
+      width: 100%;
+      background: linear-gradient(135deg, var(--surface2), #1a2540);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      user-select: none;
+      border: none;
+      text-align: left;
+    }
+    .event-block-head:hover { background: linear-gradient(135deg, #1e2d4a, #202e50); }
+
+    .event-num-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      background: var(--gold);
+      color: #000;
+      padding: 3px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* FIX #11: Nunito for event name in headers */
+    .event-block-name {
+      font-family: 'Nunito', 'Barlow', sans-serif;
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--white);
+      flex: 1;
+      letter-spacing: 0;
+    }
+
+    .event-status-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+    .es-done    { background: rgba(102,187,106,0.15); color: #66BB6A;       border: 1px solid rgba(102,187,106,0.3); }
+    .es-partial { background: rgba(232,160,0,0.15);   color: var(--gold);   border: 1px solid rgba(232,160,0,0.3); }
+    .es-pending { background: rgba(100,100,120,0.2);  color: var(--text-muted); border: 1px solid var(--border); }
+
+    /* FIX #9: Chevron rotates via CSS on the button's data-open attribute */
+    .chevron {
+      font-size: 11px;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .event-block-head[data-open="false"] .chevron { transform: rotate(-90deg); }
+
+    /* Body shown/hidden via CSS class, not inline style — avoids flicker */
+    .event-block-body { display: block; }
+    .event-block-body.hidden { display: none; }
+
+    /* ── Heat & table ── */
+    .heat-section { border-top: 1px solid var(--border); }
+    .heat-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 10px 20px 6px;
+      background: rgba(255,255,255,0.02);
+    }
+
+    /* FIX #8: Override the inner table thead so text is BLACK on gold background */
+    .event-block table { width: 100%; }
+    .event-block table thead tr { background: linear-gradient(90deg, var(--gold-dark), var(--gold)); }
+    .event-block table thead th {
+      padding: 9px 20px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #000 !important;   /* FIX #8: black text, legible on gold */
+      font-weight: 800;
+      background: none;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .event-block table tbody td { padding: 10px 20px; font-size: 14px; }
+    .event-block table tbody tr { border-bottom: 1px solid var(--border); }
+    .event-block table tbody tr:last-child td { border-bottom: none; }
+
+    .time-cell {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .time-pending { color: var(--text-muted); font-style: italic; font-size: 13px; }
+
+    .no-results-info {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div id="nav-placeholder"></div>
+  <div class="page-wrap">
+
+    <div class="live-header">
+      <div>
+        <div class="page-title">⚡ Live Results</div>
+        <!-- FIX #7: subtitle removed -->
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-input" type="text" id="search-input" placeholder="Search athlete…">
+        </div>
+        <div class="live-indicator">
+          <div class="live-dot"></div>
+          <span id="live-time">Live</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="results-container">
+      <div class="no-results-info">Loading results…</div>
+    </div>
+  </div>
+
+  <script src="utils.js"></script>
+  <script>
+    document.getElementById('nav-placeholder').innerHTML = NAV_HTML;
+    setActiveNav();
+
+    let allResults = [];
+    let searchTerm = '';
+
+    document.getElementById('search-input').addEventListener('input', e => {
+      searchTerm = e.target.value.toLowerCase();
+      renderResults();
+    });
+
+    // FIX #9: Track open/closed state in a plain JS object — never in the DOM.
+    // When we re-render we restore state from this map, so clicking doesn't fight re-renders.
+    const openState = {}; // eventNumber → true (open) / false (closed)
+
+    function isOpen(eventNum) {
+      // Default: completed/partial = open, pending = closed
+      if (openState[eventNum] !== undefined) return openState[eventNum];
+      const rows = allResults.filter(r => (r['Event#'] || '').trim() === String(eventNum));
+      const st = getEventDisplayStatus(rows);
+      return st !== 'pending';
+    }
+
+    // toggleBlock: update state then re-render. Works for any Event# including
+    // alphanumeric ones like '10A' where querySelector attribute selectors can
+    // behave inconsistently after a full DOM rebuild.
+    function toggleBlock(eventNum) {
+      openState[eventNum] = !isOpen(eventNum);
+      renderResults();
+    }
+
+    function renderResults() {
+      const container = document.getElementById('results-container');
+
+      // Build the event list ENTIRELY from allResults (the live sheet data).
+      const rawNums     = allResults.map(r => (r['Event#'] || '').trim()).filter(Boolean);
+      const sortedNums  = sortEventNums(rawNums);
+
+      // For each event number, derive event name and heats from the rows themselves
+      const dynamicEvents = sortedNums.map(en => {
+        const eRows    = allResults.filter(r => (r['Event#'] || '').trim() === en);
+        const name     = eRows[0]['EventName'] || `Event #${en}`;
+        const heatNums = [...new Set(eRows.map(r => parseInt(r['Heat#'])))].sort((a, b) => a - b);
+        const totalH   = Math.max(...heatNums);
+        const heats    = heatNums.map(hn => ({ heat_number: hn, total_heats: totalH }));
+        return { event_number: en, event_name: name, heats };
+      });
+
+      // Apply search filter
+      let visibleEvents = dynamicEvents;
+      if (searchTerm) {
+        visibleEvents = dynamicEvents.filter(event => {
+          if (event.event_name.toLowerCase().includes(searchTerm)) return true;
+          const eRows = allResults.filter(r => (r['Event#'] || '').trim() === event.event_number);
+          return eRows.some(r => r.ParticipantName && r.ParticipantName.toLowerCase().includes(searchTerm));
+        });
+      }
+
+      if (visibleEvents.length === 0) {
+        container.innerHTML = '<div class="no-results-info">No results match your search.</div>';
+        return;
+      }
+
+      // Build HTML for all events
+      const html = visibleEvents.map(event => {
+        const eventRows = allResults.filter(r => (r['Event#'] || '').trim() === event.event_number);
+        const status      = getEventDisplayStatus(eventRows);
+        const statusLabel = { done: 'Completed', partial: 'In Progress', pending: 'Upcoming' }[status];
+        const statusClass = { done: 'es-done',   partial: 'es-partial',  pending: 'es-pending'  }[status];
+        const open        = isOpen(event.event_number);
+
+        // Build each heat's table — always ordered by lane number
+        const heatHTML = event.heats.map(h => {
+          const hRows = eventRows
+            .filter(r => parseInt(r['Heat#']) === h.heat_number)
+            .sort((a, b) => parseInt(a.Lane) - parseInt(b.Lane));
+
+          const rowsHTML = hRows.map(r => {
+            const st    = (r.Status || '').trim().toUpperCase();
+            const isDNS = st === 'DNS';
+            const isDQ  = st === 'DQ';
+            const hl    = searchTerm && r.ParticipantName && r.ParticipantName.toLowerCase().includes(searchTerm)
+                          ? 'background:rgba(232,160,0,0.08);' : '';
+
+            // Only show position badge for top 3. No badge for 4th+.
+            let posCell = '';
+            if (!isDNS && !isDQ && r._position && r._position <= 3) {
+              posCell = posBadge(r._position);
+            } else if (!isDNS && !isDQ && r._position && r._position > 3) {
+              posCell = ''; // intentionally blank
+            } else {
+              posCell = '<span style="color:var(--text-muted);font-size:12px">—</span>';
+            }
+
+            // Only show house points for top 3
+            const ptsCell = (r._points && r._position <= 3)
+              ? `<span class="pts-pill">${r._points}pt</span>` : '';
+
+            return `<tr style="${hl}">
+              <td>${posCell}</td>
+              <td>${nameSpan(r.ParticipantName, r.House)}</td>
+              <td>${houseBadge(r.House)}</td>
+              <td style="color:var(--text-muted);font-size:13px">${r.Lane}</td>
+              <td class="${r._timeSec !== null ? 'time-cell' : 'time-pending'}">
+                ${isDNS ? '<span class="status-dns">DNS</span>'
+                  : isDQ  ? '<span class="status-dq">DQ</span>'
+                  : r._timeSec !== null ? formatTime(r._timeSec)
+                  : '—'}
+              </td>
+              <td>${ptsCell}</td>
+            </tr>`;
+          }).join('');
+
+          return `<div class="heat-section">
+            <div class="heat-label">Heat ${h.heat_number} of ${h.total_heats}</div>
+            <table>
+              <thead><tr>
+                <th>Pos</th><th>Athlete</th><th>House</th><th>Lane</th><th>Time</th><th>Pts</th>
+              </tr></thead>
+              <tbody>${rowsHTML}</tbody>
+            </table>
+          </div>`;
+        }).join('');
+
+        return `
+          <div class="event-block">
+            <button
+              class="event-block-head"
+              data-event-btn="${event.event_number}"
+              data-open="${open}"
+              onclick="toggleBlock('${event.event_number}')"
+            >
+              <span class="event-num-badge">#${event.event_number}</span>
+              <span class="event-block-name">${event.event_name}</span>
+              <span class="event-status-badge ${statusClass}">${statusLabel}</span>
+              <span class="chevron">▼</span>
+            </button>
+            <div class="event-block-body${open ? '' : ' hidden'}" data-event-body="${event.event_number}">
+              ${heatHTML}
+            </div>
+          </div>`;
+      }).join('');
+
+      container.innerHTML = html;
+    }
+
+    async function refresh() {
+      allResults = await fetchResults();
+      renderResults();
+      document.getElementById('live-time').textContent = `Updated ${new Date().toLocaleTimeString()}`;
+    }
+
+    startAutoRefresh(refresh, 20000);
+  </script>
+</body>
+</html>

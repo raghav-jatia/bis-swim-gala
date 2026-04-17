@@ -1,0 +1,267 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&family=Nunito:wght@700;800;900&display=swap');
+
+/* FIX #11: .event-header-font — Nunito is bold, rounded, highly legible.
+   Applied to all event name headings across every page. */
+.event-header-font {
+  font-family: 'Nunito', 'Barlow', sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: 0 !important;
+}
+
+:root {
+  --gold: #E8A000;
+  --gold-light: #FFD060;
+  --gold-dark: #B87800;
+  --alpha-color: #E53935;
+  --alpha-light: #FFEBEE;
+  --beta-color: #2E7D32;
+  --beta-light: #E8F5E9;
+  --gamma-color: #1565C0;
+  --gamma-light: #E3F2FD;
+  --bg: #0A0E1A;
+  --surface: #121929;
+  --surface2: #1C2640;
+  --border: rgba(232,160,0,0.2);
+  --text: #F0F4FF;
+  --text-muted: #8899BB;
+  --white: #FFFFFF;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* ── HEADER ── */
+.site-header {
+  background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold) 40%, var(--gold-light) 100%);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(232,160,0,0.4);
+}
+
+.header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-logo {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: #0A0E1A;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.header-logo span {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.header-date {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(10,14,26,0.7);
+  margin-left: auto;
+}
+
+/* ── NAV ── */
+.site-nav {
+  background: var(--surface);
+  border-bottom: 2px solid var(--border);
+}
+
+.nav-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  gap: 4px;
+}
+
+.nav-link {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 14px 16px;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.nav-link:hover { color: var(--gold); border-bottom-color: rgba(232,160,0,0.4); }
+.nav-link.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* ── PAGE ── */
+.page-wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px 24px 60px;
+}
+
+.page-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 42px;
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+/* ── TABLES ── */
+.table-wrap { overflow-x: auto; border-radius: 10px; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+thead tr {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+}
+
+thead th {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #0A0E1A;
+  padding: 12px 16px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+tbody tr:hover { background: rgba(232,160,0,0.05); }
+
+tbody td {
+  padding: 11px 16px;
+  vertical-align: middle;
+}
+
+/* ── HOUSE BADGES ── */
+.house-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.house-Alpha { background: rgba(229,57,53,0.15); color: #FF6B6B; border: 1px solid rgba(229,57,53,0.3); }
+.house-Beta  { background: rgba(46,125,50,0.15); color: #66BB6A; border: 1px solid rgba(46,125,50,0.3); }
+.house-Gamma { background: rgba(21,101,192,0.15); color: #64B5F6; border: 1px solid rgba(21,101,192,0.3); }
+
+.name-Alpha { color: #FF6B6B; font-weight: 600; }
+.name-Beta  { color: #66BB6A; font-weight: 600; }
+.name-Gamma { color: #64B5F6; font-weight: 600; }
+
+/* ── POSITION BADGES ── */
+.pos-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.pos-1 { background: linear-gradient(135deg, #FFD700, #FFA000); color: #000; }
+.pos-2 { background: linear-gradient(135deg, #E0E0E0, #9E9E9E); color: #000; }
+.pos-3 { background: linear-gradient(135deg, #CD7F32, #8B4513); color: #fff; }
+.pos-other { background: var(--surface2); color: var(--text-muted); }
+
+/* ── POINTS PILL ── */
+.pts-pill {
+  display: inline-block;
+  background: rgba(232,160,0,0.15);
+  color: var(--gold);
+  border: 1px solid rgba(232,160,0,0.3);
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* ── SECTION HEADING ── */
+.section-head {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 8px 0 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+/* ── STATUS BADGES ── */
+.status-dns { color: #888; font-style: italic; font-size: 12px; }
+.status-dq  { color: #FF5252; font-style: italic; font-size: 12px; }
+.status-done { color: #66BB6A; font-size: 12px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .page-title { font-size: 28px; }
+  .nav-link { padding: 12px 10px; font-size: 11px; letter-spacing: 1px; }
+  .header-date { display: none; }
+  .page-wrap { padding: 20px 16px 40px; }
+}

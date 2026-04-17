@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BIS Swim Gala — Events</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .reporting-note {
+      background: rgba(232,160,0,0.08);
+      border: 1px solid rgba(232,160,0,0.25);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 28px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .reporting-note strong { color: var(--gold); }
+
+    .reporting-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .rep-item {
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+    .rep-item strong { color: var(--text); display: block; margin-bottom: 2px; }
+    .rep-item span { color: var(--gold); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; }
+
+    .events-table-wrap { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+
+    .row-done { opacity: 0.7; }
+    .row-done td:first-child::before { content: '✓ '; color: #66BB6A; }
+
+    .gender-girl { color: #F48FB1; }
+    .gender-boy  { color: #81D4FA; }
+
+    .age-chip {
+      display: inline-block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 2px 9px;
+      border-radius: 10px;
+      background: var(--surface2);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .heats-count {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .distance-chip {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--gold);
+    }
+  </style>
+</head>
+<body>
+  <div id="nav-placeholder"></div>
+  <div class="page-wrap">
+    <div class="page-title">📋 Events</div>
+    <div class="page-subtitle" id="events-subtitle">Events in race order · 18 April 2026</div>
+
+    <div class="reporting-note">
+      <strong>⏰ Reporting Times — Please arrive 20 minutes before your age group</strong>
+      <div class="reporting-grid">
+        <div class="rep-item"><strong>Under 8</strong><span>1:00 PM</span></div>
+        <div class="rep-item"><strong>Under 10</strong><span>1:30 PM</span></div>
+        <div class="rep-item"><strong>Under 12</strong><span>2:00 PM</span></div>
+        <div class="rep-item"><strong>Under 14</strong><span>2:30 PM</span></div>
+        <div class="rep-item"><strong>Under 16</strong><span>3:00 PM</span></div>
+      </div>
+      <div style="margin-top:10px;font-size:12px;">⚠️ Late arrivals will be marked DNS (Did Not Start).</div>
+    </div>
+
+    <div class="events-table-wrap">
+      <table id="events-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Event Name</th>
+            <th>Distance</th>
+            <th>Stroke</th>
+            <th>Gender</th>
+            <th>Age Group</th>
+            <th>Heats</th>
+            <th>Athletes</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="events-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="utils.js"></script>
+  <script>
+    document.getElementById('nav-placeholder').innerHTML = NAV_HTML;
+    setActiveNav();
+
+    async function render() {
+      const results = await fetchResults();
+      // Build event list from sheet data — fully dynamic, no SWIM_DATA
+      const events = buildEventList(results);
+
+      // Update subtitle with live event count
+      document.getElementById('events-subtitle').textContent =
+        `${events.length} event${events.length !== 1 ? 's' : ''} in race order · 18 April 2026`;
+
+      const tbody = document.getElementById('events-tbody');
+      tbody.innerHTML = events.map(event => {
+        const { dist, stroke, gender, age } = parseEventName(event.event_name);
+        const eventRows   = results.filter(r => (r['Event#'] || '').trim() === event.event_number);
+        const total       = eventRows.length;
+        const isDone      = isEventCompleted(eventRows);
+        const hasTimes    = eventRows.some(r => r._timeSec !== null);
+        const isPartial   = !isDone && hasTimes;
+
+        const statusHTML = isDone
+          ? '<span style="font-family:\'Barlow Condensed\';font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:10px;background:rgba(102,187,106,0.15);color:#66BB6A;border:1px solid rgba(102,187,106,0.3);">Done</span>'
+          : isPartial
+          ? '<span style="font-family:\'Barlow Condensed\';font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:10px;background:rgba(232,160,0,0.15);color:var(--gold);border:1px solid rgba(232,160,0,0.3);">Active</span>'
+          : '<span style="font-family:\'Barlow Condensed\';font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:10px;background:rgba(100,100,120,0.2);color:var(--text-muted);border:1px solid var(--border);">Upcoming</span>';
+
+        return `<tr class="${isDone ? 'row-done' : ''}">
+          <td style="font-family:'Barlow Condensed';font-weight:800;font-size:16px;color:var(--gold)">${event.event_number}</td>
+          <td style="font-weight:600">${event.event_name}</td>
+          <td><span class="distance-chip">${dist}</span></td>
+          <td style="font-size:13px">${stroke}</td>
+          <td class="${gender === 'Girls' ? 'gender-girl' : 'gender-boy'}" style="font-weight:600">${gender}</td>
+          <td><span class="age-chip">${age}</span></td>
+          <td class="heats-count">${event.heats.length} heat${event.heats.length > 1 ? 's' : ''}</td>
+          <td style="color:var(--text-muted);font-size:13px">${total}</td>
+          <td>${statusHTML}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    startAutoRefresh(render, 30000);
+  </script>
+</body>
+</html>

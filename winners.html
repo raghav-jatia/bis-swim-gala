@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BIS Swim Gala — Event Winners</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .filter-btn {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 7px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .filter-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
+
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .event-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .event-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .event-card-head {
+      background: linear-gradient(135deg, var(--surface2), #1a2540);
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .event-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 2px;
+    }
+    .event-title {
+      font-family: 'Nunito', 'Barlow', sans-serif;
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+    .event-card-body { padding: 14px 16px; }
+
+    .no-results {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 10px 0;
+    }
+
+    .podium-entry {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .podium-entry:last-child { border-bottom: none; }
+    .podium-name { flex: 1; font-size: 14px; }
+    .podium-t {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .podium-pts {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .pending-badge {
+      display: inline-block;
+      background: rgba(232,160,0,0.1);
+      border: 1px dashed var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      margin-top: 4px;
+    }
+
+    .no-events {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div id="nav-placeholder"></div>
+  <div class="page-wrap">
+    <div class="page-title">🏅 Event Winners</div>
+    <div class="page-subtitle">Top 3 finishers per event · Updated live</div>
+
+    <div class="filter-bar" id="filter-bar">
+      <button class="filter-btn active" data-filter="all">All Events</button>
+      <button class="filter-btn" data-filter="Under 8">Under 8</button>
+      <button class="filter-btn" data-filter="Under 10">Under 10</button>
+      <button class="filter-btn" data-filter="Under 12">Under 12</button>
+      <button class="filter-btn" data-filter="Under 14">Under 14</button>
+      <button class="filter-btn" data-filter="Under 16">Under 16</button>
+      <button class="filter-btn" data-filter="Girls">Girls</button>
+      <button class="filter-btn" data-filter="Boys">Boys</button>
+    </div>
+
+    <div class="events-grid" id="events-grid">
+      <div class="no-events">Loading results…</div>
+    </div>
+  </div>
+
+  <script src="utils.js"></script>
+  <script>
+    document.getElementById('nav-placeholder').innerHTML = NAV_HTML;
+    setActiveNav();
+
+    let currentFilter = 'all';
+    let allResults = [];
+
+    document.getElementById('filter-bar').addEventListener('click', e => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      renderGrid();
+    });
+
+    function renderGrid() {
+      const grid = document.getElementById('events-grid');
+      // Build event list entirely from sheet rows — no SWIM_DATA
+      let events = buildEventList(allResults);
+
+      if (currentFilter !== 'all') {
+        events = events.filter(e => e.event_name.includes(currentFilter));
+      }
+
+      if (events.length === 0) {
+        grid.innerHTML = '<div class="no-events">No events match this filter.</div>';
+        return;
+      }
+
+      grid.innerHTML = events.map(event => {
+        const eventRows = allResults.filter(r => (r['Event#'] || '').trim() === event.event_number);
+        const top3      = eventRows.filter(r => r._position && r._position <= 3)
+          .sort((a, b) => a._position - b._position);
+        const hasTimes  = top3.length > 0;
+        const completed = eventRows.some(r => r._eventCompleted);
+
+        return `<div class="event-card">
+          <div class="event-card-head">
+            <div class="event-num">Event #${event.event_number}</div>
+            <div class="event-title">${event.event_name}</div>
+          </div>
+          <div class="event-card-body">
+            ${!completed
+              ? '<span class="pending-badge">⏳ Awaiting completion</span>'
+              : !hasTimes
+              ? '<span class="pending-badge">⏳ Awaiting results</span>'
+              : top3.map(r => `
+                <div class="podium-entry">
+                  ${posBadge(r._position)}
+                  <div class="podium-name">${nameSpan(r.ParticipantName, r.House)} ${houseBadge(r.House)}</div>
+                  <span class="podium-t">${formatTime(r._timeSec)}</span>
+                  <span class="podium-pts">${r._points ? r._points + 'pt' : ''}</span>
+                </div>`).join('')
+            }
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    async function refresh() {
+      allResults = await fetchResults();
+      renderGrid();
+    }
+
+    startAutoRefresh(refresh, 20000);
+  </script>
+</body>
+</html>
