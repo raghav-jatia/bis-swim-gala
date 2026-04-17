@@ -74,6 +74,56 @@
       font-size: 14px;
       color: var(--gold);
     }
+
+    /* ── MOBILE: Events table ─────────────────────────────────────
+       Hides Distance(3), Stroke(4), Gender(5), Age Group(6) columns.
+       Heats column clipped to show number only — no logic change.
+       Edge margin matches live.html treatment.
+       Desktop completely untouched.
+    ────────────────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+
+      /* Edge breathing room — matches live.html */
+      .events-table-wrap { margin: 0 2px; border-radius: 8px; }
+
+      /* Table fills container, no overflow */
+      #events-table { table-layout: fixed; width: 100%; }
+
+      /* Tighter cells */
+      #events-table thead th { padding: 8px 6px; font-size: 9px; letter-spacing: 0.6px; }
+      #events-table tbody td { padding: 9px 6px; font-size: 12px; }
+
+      /* HIDE: Distance, Stroke, Gender, Age Group (cols 3–6) */
+      #events-table thead th:nth-child(3),
+      #events-table tbody td:nth-child(3),
+      #events-table thead th:nth-child(4),
+      #events-table tbody td:nth-child(4),
+      #events-table thead th:nth-child(5),
+      #events-table tbody td:nth-child(5),
+      #events-table thead th:nth-child(6),
+      #events-table tbody td:nth-child(6) { display: none; }
+
+      /* Column widths for remaining 5 cols: # | Event Name | Heats | Athletes | Status */
+      #events-table thead th:nth-child(1),
+      #events-table tbody td:nth-child(1) { width: 28px; }
+
+      #events-table thead th:nth-child(2),
+      #events-table tbody td:nth-child(2) { width: auto; word-break: break-word; }
+
+      /* Heats col: font-size 0 hides all text; ::first-letter restores just the digit */
+      #events-table thead th:nth-child(7) { width: 26px; }
+      #events-table tbody td:nth-child(7) { width: 26px; font-size: 0; white-space: nowrap; }
+      #events-table tbody td:nth-child(7)::first-letter { font-size: 12px; color: var(--text-muted); }
+
+      #events-table thead th:nth-child(8),
+      #events-table tbody td:nth-child(8) { width: 34px; text-align: center; }
+
+      #events-table thead th:nth-child(9) { width: 58px; text-align: right; }
+      #events-table tbody td:nth-child(9) { width: 58px; text-align: right; }
+
+      /* Status badges: tighten padding on mobile so they fit the narrow col */
+      #events-table tbody td:nth-child(9) span { padding: 3px 6px !important; font-size: 9px !important; letter-spacing: 0.8px !important; }
+    }
   </style>
 </head>
 <body>

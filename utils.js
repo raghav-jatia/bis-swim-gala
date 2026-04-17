@@ -273,7 +273,7 @@ const NAV_HTML = `
     <a class="nav-link" href="index.html">🏠 Home</a>
     <a class="nav-link" href="winners.html">🏅 Winners</a>
     <a class="nav-link" href="live.html">⚡ Live Results</a>
-    <a class="nav-link" href="events.html">📋 Events</a>
     <a class="nav-link" href="participants.html">👤 Participants</a>
+    <a class="nav-link" href="events.html">📋 Events</a>
   </div>
 </nav>`;

@@ -261,7 +261,33 @@ tbody td {
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   .page-title { font-size: 28px; }
-  .nav-link { padding: 12px 10px; font-size: 11px; letter-spacing: 1px; }
   .header-date { display: none; }
   .page-wrap { padding: 20px 16px 40px; }
+
+  /* NAV: exactly 2 locked rows, no overflow, no scrollbar.
+     Row 1 — Home · Winners · Live Results: each exactly 33.333% wide.
+     Row 2 — Events · Participants: each exactly 50% wide.
+     gap:0 + width (not flex-basis) makes percentages absolute so
+     nothing can spill onto a 3rd line.                              */
+  .nav-inner {
+    flex-wrap: wrap;
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  .nav-link {
+    flex: none;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 7px 2px;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* Row 1: first 3 links — exactly 1/3 each */
+  .nav-link:nth-child(-n+3) { width: 33.333%; }
+  /* Row 2: last 2 links — exactly 1/2 each */
+  .nav-link:nth-child(n+4)  { width: 50%; }
 }

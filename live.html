@@ -183,6 +183,64 @@
       color: var(--text-muted);
       font-size: 15px;
     }
+
+    /* ── MOBILE: Live Results table ───────────────────────────────
+       Hides the House and Pts columns (redundant on small screens).
+       Tightens padding and font sizes so Pos/Athlete/Lane/Time fit
+       cleanly within the viewport — no horizontal scrollbar needed.
+       Desktop layout is completely untouched.
+    ─────────────────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+
+      /* Search input full-width on mobile */
+      .search-input { width: 100%; }
+
+      /* Event block header: shrink font so long event names don't overflow */
+      .event-block-name { font-size: 13px; line-height: 1.25; }
+      .event-block-head { padding: 12px 14px; gap: 8px; }
+      .event-num-badge  { font-size: 11px; padding: 3px 8px; }
+      .event-status-badge { font-size: 9px; padding: 3px 7px; letter-spacing: 0.8px; }
+
+      /* Tighten heat label */
+      .heat-label { padding: 8px 14px 5px; }
+
+      /* Table: let it fill the container, no overflow */
+      .event-block table { table-layout: fixed; width: 100%; }
+
+      /* Tighter cell padding and smaller base font */
+      .event-block table thead th { padding: 8px 6px; font-size: 9px; letter-spacing: 0.8px; }
+      .event-block table tbody td { padding: 9px 6px; font-size: 13px; }
+
+      /* HIDE: House column (3rd th / 3rd td) — info already in athlete name colour */
+      .event-block table thead th:nth-child(3),
+      .event-block table tbody td:nth-child(3) { display: none; }
+
+      /* HIDE: Pts column (6th th / 6th td) — points visible on Winners page */
+      .event-block table thead th:nth-child(6),
+      .event-block table tbody td:nth-child(6) { display: none; }
+
+      /* Column widths for the 4 remaining cols: Pos | Athlete | Lane | Time */
+      .event-block table thead th:nth-child(1),
+      .event-block table tbody td:nth-child(1) { width: 36px; }
+
+      .event-block table thead th:nth-child(2),
+      .event-block table tbody td:nth-child(2) { width: auto; }
+
+      .event-block table thead th:nth-child(4),
+      .event-block table tbody td:nth-child(4) { width: 38px; text-align: center; }
+
+      .event-block table thead th:nth-child(5),
+      .event-block table tbody td:nth-child(5) { width: 68px; text-align: right; white-space: nowrap; }
+
+      /* Time cell slightly smaller on mobile */
+      .time-cell { font-size: 14px; }
+
+      /* Prevent athlete names from wrapping awkwardly */
+      .event-block table tbody td:nth-child(2) { word-break: break-word; }
+
+      /* Add breathing room so event blocks don't sit flush against screen edges */
+      .event-block { margin-left: 2px; margin-right: 2px; }
+    }
   </style>
 </head>
 <body>
