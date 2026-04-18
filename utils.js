@@ -162,10 +162,19 @@ function enrichResults(rows) {
         return t !== null && st !== 'DNS' && st !== 'DQ';
       })
       .sort((a, b) => parseTime(a['TimeSeconds']) - parseTime(b['TimeSeconds']));
-    timed.forEach((r, i) => {
+
+    // Ties: athletes with identical times share the same position.
+    // Position = number of distinct time groups before this one + 1.
+    // This means ranks never skip — tie for 1st → both pos 1, next gets pos 2.
+    const seenTimes = []; // ordered list of unique times seen so far
+    for (let i = 0; i < timed.length; i++) {
+      const r = timed[i];
       const k = `${r['Event#'].trim()}_${r['Heat#']}_${r['Lane']}`;
-      positionMap[k] = { position: i + 1, points: POINTS_MAP[i + 1] || 0 };
-    });
+      const t = parseTime(r['TimeSeconds']);
+      if (!seenTimes.includes(t)) seenTimes.push(t);
+      const pos = seenTimes.indexOf(t) + 1; // 1-based position = rank of this time group
+      positionMap[k] = { position: pos, points: POINTS_MAP[pos] || 0 };
+    }
   }
 
   for (const row of rows) {
@@ -256,6 +265,12 @@ function setActiveNav() {
 function startAutoRefresh(callback, intervalMs = 30000) {
   callback();
   setInterval(callback, intervalMs);
+}
+
+// ── FIRST NAME HELPER ─────────────────────────────────────────────
+// Used when combining tied athletes into one display row.
+function firstName(fullName) {
+  return (fullName || '').trim().split(' ')[0];
 }
 
 // ── NAV HTML ──────────────────────────────────────────────────────

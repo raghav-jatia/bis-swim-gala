@@ -183,10 +183,18 @@
 
       grid.innerHTML = events.map(event => {
         const eventRows = allResults.filter(r => (r['Event#'] || '').trim() === event.event_number);
-        const top3      = eventRows.filter(r => r._position && r._position <= 3)
+        const topRows   = eventRows.filter(r => r._position && r._position <= 3)
           .sort((a, b) => a._position - b._position);
-        const hasTimes  = top3.length > 0;
+        const hasTimes  = topRows.length > 0;
         const completed = eventRows.some(r => r._eventCompleted);
+
+        // Group by position to handle ties — each group is one display row
+        const byPos = {};
+        topRows.forEach(r => {
+          if (!byPos[r._position]) byPos[r._position] = [];
+          byPos[r._position].push(r);
+        });
+        const podiumRows = Object.values(byPos).sort((a, b) => a[0]._position - b[0]._position);
 
         return `<div class="event-card">
           <div class="event-card-head">
@@ -198,13 +206,19 @@
               ? '<span class="pending-badge">⏳ Awaiting completion</span>'
               : !hasTimes
               ? '<span class="pending-badge">⏳ Awaiting results</span>'
-              : top3.map(r => `
-                <div class="podium-entry">
-                  ${posBadge(r._position)}
-                  <div class="podium-name">${nameSpan(r.ParticipantName, r.House)} ${houseBadge(r.House)}</div>
-                  <span class="podium-t">${formatTime(r._timeSec)}</span>
-                  <span class="podium-pts">${r._points ? r._points + 'pt' : ''}</span>
-                </div>`).join('')
+              : podiumRows.map(group => {
+                  const isTie = group.length > 1;
+                  const nameHTML = isTie
+                    ? group.map(r => `<span class="name-${r.House}">${firstName(r.ParticipantName)}</span>`).join(' <span style="color:var(--text-muted)">&amp;</span> ') + ' <span style="color:var(--text-muted);font-style:italic">(Tied)</span>'
+                    : `${nameSpan(group[0].ParticipantName, group[0].House)} ${houseBadge(group[0].House)}`;
+                  return `
+                    <div class="podium-entry">
+                      ${posBadge(group[0]._position)}
+                      <div class="podium-name">${nameHTML}</div>
+                      <span class="podium-t">${formatTime(group[0]._timeSec)}</span>
+                      <span class="podium-pts">${group[0]._points ? group[0]._points + 'pt' : ''}</span>
+                    </div>`;
+                }).join('')
             }
           </div>
         </div>`;

@@ -284,20 +284,33 @@
       } else {
         // Get event name from the rows themselves (no SWIM_DATA needed)
         const eventName = last.rows[0]['EventName'] || `Event #${last.event_number}`;
-        const top3 = last.rows
+        const topRows = last.rows
           .filter(r => r._timeSec !== null && r._position && r._position <= 3)
           .sort((a, b) => a._position - b._position);
 
+        // Group by position to handle ties
+        const byPos = {};
+        topRows.forEach(r => {
+          if (!byPos[r._position]) byPos[r._position] = [];
+          byPos[r._position].push(r);
+        });
+        const podiumRows = Object.values(byPos).sort((a, b) => a[0]._position - b[0]._position);
+
         lr.innerHTML = `<div class="last-event-title">Event #${last.event_number}: ${eventName}</div>` +
-          (top3.length === 0
+          (podiumRows.length === 0
             ? '<div class="last-race-empty">Results being processed…</div>'
-            : top3.map(r => `
-              <div class="podium-row">
-                ${posBadge(r._position)}
-                ${nameSpan(r.ParticipantName, r.House)}
-                ${houseBadge(r.House)}
-                <span class="podium-time">${formatTime(r._timeSec)}</span>
-              </div>`).join(''));
+            : podiumRows.map(group => {
+                const isTie = group.length > 1;
+                const nameHTML = isTie
+                  ? group.map(r => `<span class="name-${r.House}">${firstName(r.ParticipantName)}</span>`).join(' <span style="color:var(--text-muted)">&amp;</span> ') + ' <span style="color:var(--text-muted);font-style:italic">(Tied)</span>'
+                  : `${nameSpan(group[0].ParticipantName, group[0].House)} ${houseBadge(group[0].House)}`;
+                return `
+                  <div class="podium-row">
+                    ${posBadge(group[0]._position)}
+                    ${nameHTML}
+                    <span class="podium-time">${formatTime(group[0]._timeSec)}</span>
+                  </div>`;
+              }).join(''));
       }
 
       document.getElementById('refresh-status').textContent = `Live · Last updated ${new Date().toLocaleTimeString()}`;
